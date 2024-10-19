@@ -6,7 +6,7 @@ const { tryCatch } = require("../../helper/helperMain");
 const { ObjectId } = require("mongodb");
 const { isValidObjectId } = require("mongoose");
 const router = express.Router();
-const maxRoundInRps = 2;
+const maxRoundInRps = 10;
 
 
 async function saveWinnerTransaction(winnerId, bettingId) {
