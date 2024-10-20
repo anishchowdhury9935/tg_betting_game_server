@@ -22,5 +22,5 @@ app.use('/api',require('./utils/routes/choice.js'));
 
 
 server.listen(port, () => {
-    console.log(`chat app backend listening on port: http://localhost:${port}`)
+    console.log(`server listening on port: http://localhost:${port}`)
 }) 

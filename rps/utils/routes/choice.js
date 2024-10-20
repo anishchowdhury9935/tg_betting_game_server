@@ -6,7 +6,7 @@ const { tryCatch } = require("../../helper/helperMain");
 const { ObjectId } = require("mongodb");
 const { isValidObjectId } = require("mongoose");
 const router = express.Router();
-const maxRoundInRps = 10;
+const maxRoundInRps = 3;
 
 
 async function saveWinnerTransaction(winnerId, bettingId) {
@@ -33,6 +33,7 @@ async function saveWinnerTransaction(winnerId, bettingId) {
 };
 
 function findWinner(player1Id, player2Id) {
+    console.log(player1Id, player2Id)
     if (player1Id.winCount === player2Id.winCount) {
         return 'draw';
     }
@@ -60,10 +61,16 @@ router.get('/bettingbasicdata/:bettingId', async (req, res) => {
                 return { userId: data, winCount: 0 }
             })
             const newBet = await userRpsGameData.create({ bettingId, playerRoundWin: [...newArr] });
-            return res.status(201).json({ data: newBet });
+            // return res.status(201).json({ data: newBet });
         }
         if (existingBet.roundNumber >= maxRoundInRps) {
-            return res.status(200).json({ data: { shouldProceedRound: false, winner: findWinner(existingBet.playerRoundWin[0], existingBet.playerRoundWin[1]) } });
+            const winnerId = findWinner(existingBet.playerRoundWin[0], existingBet.playerRoundWin[1]);
+            if (winnerId !== 'draw') {
+                const _saveWinnerTransaction = await saveWinnerTransaction(winnerId, bettingId);
+            } else {
+                const deleteBettingRpsData = await userRpsGameData.deleteOne({ _id: bettingId });
+            }
+            return res.status(200).json({ data: { shouldProceedRound: false, winner: winnerId } });
         }
         return res.status(200).json({ data: existingBet });
     } catch (error) {
@@ -94,9 +101,9 @@ router.put('/bettingbasicdata/:bettingId/:winnerId', async (req, res) => {
         if (!updatedBet) {
             return res.status(404).json({ message: "Bet not found" });
         }
-        if (updatedBet.roundNumber >= maxRoundInRps) {
-            const winnerId = findWinner(updatedBet.playerRoundWin[0], updatedBet.playerRoundWin[1])
-            console.log(winnerId)
+        const newBetUpdated = await userRpsGameData.findOne({ bettingId });
+        if (newBetUpdated.roundNumber >= maxRoundInRps) {
+            const winnerId = findWinner(newBetUpdated.playerRoundWin[0], newBetUpdated.playerRoundWin[1]);
             if (winnerId !== 'draw') {
                 const _saveWinnerTransaction = await saveWinnerTransaction(winnerId, bettingId);
             } else {
