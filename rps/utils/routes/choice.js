@@ -63,7 +63,7 @@ router.get('/bettingbasicdata/:bettingId', async (req, res) => {
             const newBet = await userRpsGameData.create({ bettingId, playerRoundWin: [...newArr] });
             // return res.status(201).json({ data: newBet });
         }
-        if (existingBet.roundNumber >= maxRoundInRps) {
+        if (!!existingBet && existingBet.roundNumber >= maxRoundInRps) {
             const winnerId = findWinner(existingBet.playerRoundWin[0], existingBet.playerRoundWin[1]);
             if (winnerId !== 'draw') {
                 const _saveWinnerTransaction = await saveWinnerTransaction(winnerId, bettingId);
