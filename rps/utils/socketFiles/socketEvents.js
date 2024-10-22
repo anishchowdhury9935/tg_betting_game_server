@@ -26,15 +26,16 @@ const socketEvents = (io) => {
                 })
                 socket.on('isConnected', (data) => {
                     const { bettingId } = data;
+                    console.log(data)
                     socket.to(bettingId).volatile.emit('isConnected', { ...data, isConnected: true })
                     if (connectedUsers[bettingId] !== undefined && connectedUsers[bettingId].length > 1) {
                         socket.emit('isConnected', { ...data, isConnected: true })
                     }
                 })
 
-                socket.on('winnerFound', (data) => {
-                    socket.to(bettingId).volatile.emit('winnerFound', data);
-                })
+                // socket.on('winnerFound', (data) => {
+                //     socket.to(bettingId).volatile.emit('winnerFound', data);
+                // })
 
 
 
