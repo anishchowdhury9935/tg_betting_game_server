@@ -55,14 +55,14 @@ router.get('/bettingbasicdata/:bettingId', async (req, res) => {
             return res.status(200).json({ isBetFound: false })
         }
         const existingBet = await userRpsGameData.findOne({ bettingId });
-        if (!existingBet) {
-            const findUserBettingData = await userBettingData.findOne({ _id: bettingId });
-            const newArr = findUserBettingData.playersId.map((data) => {
-                return { userId: data, winCount: 0 }
-            })
-            const newBet = await userRpsGameData.create({ bettingId, playerRoundWin: [...newArr] });
-            // return res.status(201).json({ data: newBet });
-        }
+        // if (!existingBet) {
+        //     const findUserBettingData = await userBettingData.findOne({ _id: bettingId });
+        //     const newArr = findUserBettingData.playersId.map((data) => {
+        //         return { userId: data, winCount: 0 }
+        //     })
+        //     const newBet = await userRpsGameData.create({ bettingId, playerRoundWin: [...newArr] });
+        //     // return res.status(201).json({ data: newBet });
+        // }
         if (!!existingBet && existingBet.roundNumber >= maxRoundInRps) {
             const winnerId = findWinner(existingBet.playerRoundWin[0], existingBet.playerRoundWin[1]);
             if (winnerId !== 'draw') {
